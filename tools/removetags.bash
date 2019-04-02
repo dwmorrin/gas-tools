@@ -1,3 +1,4 @@
+#!/bin/bash
 if [ "$#" -ne 2 ]; then
     echo "usage: $(basename "$0") tag inputfile"
     exit 1

@@ -1,3 +1,4 @@
+#!/bin/bash
 # requires chext.sh and removetags.sh
 # helper script for working on Google Apps Script projects with clasp
 progname="$(basename "$0")"
