@@ -11,7 +11,7 @@ if [[ $firstline =~ $tagname ]]; then
   exit 1
 fi
 # shellcheck disable=SC1004
-if sed -i '.bak' '
+if sed -i'.bak' '
 1i\
 <'"$tagname"'>
 
