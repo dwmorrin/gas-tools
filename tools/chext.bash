@@ -1,3 +1,4 @@
+#!/bin/bash
 if [ "$#" -lt 2 ]; then
     echo "usage: $(basename "$0") ext1 ext2 [files ...]"
     echo "  ext1 files will become ext2 files"

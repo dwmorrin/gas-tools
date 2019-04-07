@@ -9,6 +9,9 @@ Could just be my workspace setup, but I wasn't getting good syntax highlighting 
 I have these scripts in my `~/bin`, and will run `degas` to edit files, and `regas` before commiting.
 **Warning: This is a work in progress.  Not debugged.  Can ruin your files!**
 
+`install` will copy the contents of `tools` into `~/bin` without the .sh, .bash extensions and `chmod +x` them.
+usage: `chmod +x install && ./install`
+
 ## Summary
 - `removetags.bash`: uses sed to delete the specified tag
 - `addtags.bash`: uses sed to insert the specified tag at the first and last lines

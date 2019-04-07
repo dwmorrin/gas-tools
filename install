@@ -1,0 +1,31 @@
+#!/bin/bash
+if [ ! -d tools ]; then
+  echo "$(basename "$0") could not find directory \"tools\" to install from"
+  exit 1
+fi
+for file in tools/*; do
+  ext=${file#*.}
+  if [[ ! $ext =~ sh$ ]]; then
+    echo "$ext does not end in bash or sh? skipping to be safe"
+    continue
+  fi
+  firstline=$(sed 1q "$file")
+  if [[ ! $firstline =~ ^#!/bin/(ba)*sh ]]; then
+    echo "$file ends in $ext but has no shebang? skipping to be safe"
+    continue
+  fi
+  filename=${file%.*}
+  read -r -p "install $filename in ~/bin? [y/n] " confirmation
+  if [ "$confirmation" != "y" ]; then
+    continue
+  fi
+  if [ ! -d "$HOME" ]; then
+    echo "no home directory found, aborting"
+    exit 1
+  fi
+  if [ ! -d "$HOME/bin" ]; then
+    mkdir "$HOME/bin"
+  fi
+  tool=$(basename "$filename")
+  cp "$file" "$HOME/bin/$tool" && chmod +x "$HOME/bin/$tool"
+done
