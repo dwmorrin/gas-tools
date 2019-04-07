@@ -30,7 +30,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 if ! $quiet && $noargs; then
-    read -r -p "Convert all .js to .html and add <script> tags? [y/n]" confirmation
+    read -r -p "Convert all .js and .css to .html and add html tags? [y/n] " confirmation
     if [ "$confirmation" != "y" ]; then
         exit 1
     fi
