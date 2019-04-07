@@ -5,7 +5,7 @@ if [ "$#" -ne 2 ]; then
 fi
 tagname="$1"
 filename="$2"
-if sed -i '.bak' '
+if sed -i'.bak' '
 /<\/*'"$tagname"'>/d' "$filename"
 then
     rm "$filename.bak"
