@@ -7,14 +7,11 @@ Could just be my workspace setup, but I wasn't getting good syntax highlighting 
 
 ## Typical usage
 I have these scripts in my `~/bin`, and will run `degas` to edit files, and `regas` before commiting.
-**Warning: This is a work in progress.  Not debugged.  Can ruin your files!**
+**Warning: This is a work in progress.  Please test before using.**
 
 `install` will copy the contents of `tools` into `~/bin` without the .sh, .bash extensions and `chmod +x` them.
 usage: `chmod +x install && ./install`
 
 ## Summary
-- `removetags.bash`: uses sed to delete the specified tag
-- `addtags.bash`: uses sed to insert the specified tag at the first and last lines
-- `chext.bash`: swaps around file extensions, e.g. .html => .js or .js => .html
-- `degas.bash`: wrapper for a combo of removetags and chext
-- `regas.bash`: wrapper for a combo of addtags and chext
+- `degas.bash`: converts .html to .js or .css if \<script\> or \<style\> tags found in the first line.
+- `regas.bash`: converts .js and .css to .html and inserts \<script\> or \<style\> tags.
