@@ -50,7 +50,8 @@ for file; do
         ext="css"
         tag="style"
     fi
-    if [[ -v ext ]]; then
+    # test if ext is set, note [[ -v ]] not compatible on stock MacOS bash
+    if [ -n "${ext+1}" ]; then
         if ! $quiet; then
             read -r -p "Convert $file to $ext? [y/n] " confirmation
             if [ "$confirmation" != "y" ]; then
