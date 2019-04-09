@@ -3,8 +3,10 @@
 # converts .html files starting with <script> into .js files
 # converts .css files starting with <style> into .css files
 
+bold=$(tput bold)
 interactive=false
 noargs=false
+norm=$(tput sgr0)
 progname="$(basename "$0")"
 quiet=false
 scriptPattern='<script>'
@@ -14,11 +16,11 @@ while getopts "iq" opt; do
     case "$opt" in
         i) interactive=true;;
         q) quiet=true;;
-       \?) echo "Usage: $progname [-q]"
+       \?) echo "Usage: $progname [-iq]"
            exit 1;;
     esac
 done
-shift $((OPTIND -1))
+shift $((OPTIND - 1))
 
 if [[ $# -eq 0 ]]; then
     noargs=true
@@ -33,7 +35,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 if ! $quiet && $noargs; then
-    read -r -p "Convert all .html to .js or .css and remove html tags? [y/n] "\
+    read -r -p "Convert all .html to .js or .css and remove html tags? ${bold}[y/n]${norm} "\
         confirmation
     if [ "$confirmation" != "y" ]; then
         exit 1
