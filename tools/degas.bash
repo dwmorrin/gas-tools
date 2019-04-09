@@ -68,7 +68,10 @@ for file; do
         fi
         mv "$file" "${file%html}$ext"
     elif ! $quiet; then
-        echo "  Ignoring $file: does not appear to be a js or css file"
+        echo "  Ignoring $file: expected <script> or <style> in first line."
+        echo "  $file: line 1: $firstline"
+        echo "  check rules on wiki page."
+        echo "  open a new issue if you expected $file to work."
     fi
 done
 
