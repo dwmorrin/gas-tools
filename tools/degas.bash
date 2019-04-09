@@ -5,12 +5,6 @@
 
 progname="$(basename "$0")"
 
-# check for presence of appropriate files first
-if ! compgen -G "*.html" >/dev/null; then
-    echo "$progname converts .html to .js or .css: no .html found"
-    exit 1
-fi
-
 quiet=false
 while getopts "q" opt; do
     case "$opt" in
@@ -21,18 +15,22 @@ while getopts "q" opt; do
 done
 shift $((OPTIND -1))
 
-# note: compgen needs nullglob unset
-shopt -s nullglob
-
 noargs=false
 if [[ $# -eq 0 ]]; then
     noargs=true
-    # insert all .html files in pwd as arguments
+    # insert all .html files in pwd as arguments, or null if no .html found
+    shopt -s nullglob
     set -- *.html
 fi
 
+if [[ $# -eq 0 ]]; then
+    echo "$progname converts .html to .js or .css: no .html found"
+    exit 1
+fi
+
 if ! $quiet && $noargs; then
-    read -r -p "Convert all .html to .js or .css and remove html tags? [y/n] " confirmation
+    read -r -p "Convert all .html to .js or .css and remove html tags? [y/n] "\
+        confirmation
     if [ "$confirmation" != "y" ]; then
         exit 1
     fi
@@ -50,11 +48,11 @@ for file; do
         ext="css"
         tag="style"
     fi
-    # test if ext is set, note [[ -v ]] not compatible on stock MacOS bash
-    if [ -n "${ext+1}" ]; then
+    # test if ext is set, note [[ -v ]] not compat with stock MacOS /bin/bash
+    if [[ -n ${ext+1} ]]; then
         if ! $quiet; then
             read -r -p "Convert $file to $ext? [y/n] " confirmation
-            if [ "$confirmation" != "y" ]; then
+            if [[ $confirmation != y ]]; then
                 continue
             fi
             echo "  Converting $file"
@@ -67,7 +65,7 @@ for file; do
             exit 1
         fi
         mv "$file" "${file%html}$ext"
-    elif ! $quiet; then
+    else
         echo "  Ignoring $file: expected <script> or <style> in first line."
         echo "  $file: line 1: $firstline"
         echo "  check rules on wiki page."
