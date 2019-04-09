@@ -14,7 +14,7 @@ while getopts "iq" opt; do
     case "$opt" in
         i) interactive=true;;
         q) quiet=true;;
-       \?) echo "Usage: $progname [-q]"
+       \?) echo "Usage: $progname [-iq]"
            exit 1;;
     esac
 done
