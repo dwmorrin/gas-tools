@@ -3,11 +3,16 @@
 # converts .html files starting with <script> into .js files
 # converts .css files starting with <style> into .css files
 
+interactive=false
+noargs=false
 progname="$(basename "$0")"
-
 quiet=false
-while getopts "q" opt; do
+scriptPattern='<script>'
+stylePattern='<style>'
+
+while getopts "iq" opt; do
     case "$opt" in
+        i) interactive=true;;
         q) quiet=true;;
        \?) echo "Usage: $progname [-q]"
            exit 1;;
@@ -15,7 +20,6 @@ while getopts "q" opt; do
 done
 shift $((OPTIND -1))
 
-noargs=false
 if [[ $# -eq 0 ]]; then
     noargs=true
     # insert all .html files in pwd as arguments, or null if no .html found
@@ -36,8 +40,6 @@ if ! $quiet && $noargs; then
     fi
 fi
 
-scriptPattern='<script>'
-stylePattern='<style>'
 for file; do
     unset ext
     firstline=$(sed 1q "$file")
@@ -50,7 +52,7 @@ for file; do
     fi
     # test if ext is set, note [[ -v ]] not compat with stock MacOS /bin/bash
     if [[ -n ${ext+1} ]]; then
-        if ! $quiet; then
+        if $interactive; then
             read -r -p "Convert $file to $ext? [y/n] " confirmation
             if [[ $confirmation != y ]]; then
                 continue

@@ -2,16 +2,13 @@
 # helper script for working on Google Apps Script projects with clasp
 
 progname="$(basename "$0")"
-
-# check for presence of appropriate files first
-if ! compgen -G "*."{js,css} >/dev/null; then
-    echo "$(basename "$0") converts .js and .css to .html: no .js or .css found"
-    exit 1
-fi
-
+interactive=false
 quiet=false
-while getopts "q" opt; do
+noargs=false
+
+while getopts "iq" opt; do
     case "$opt" in
+        i) interactive=true;;
         q) quiet=true;;
        \?) echo "Usage: $progname [-q]"
            exit 1;;
@@ -19,14 +16,16 @@ while getopts "q" opt; do
 done
 shift $((OPTIND -1))
 
-# note: compgen needs nullglob unset
-shopt -s nullglob
-
-noargs=false
 if [[ $# -eq 0 ]]; then
     noargs=true
-    # insert all .js and .css files in pwd as arguments, requires nullglob
+    # insert all .js and .css files in pwd as arguments, or null if files not found
+    shopt -s nullglob
     set -- *.{js,css}
+fi
+
+if [[ $# -eq 0 ]]; then
+    echo "$(basename "$0") converts .js and .css to .html: no .js or .css found"
+    exit 1
 fi
 
 if ! $quiet && $noargs; then
@@ -54,7 +53,7 @@ for file; do
         fi
         continue
     fi
-    if ! $quiet; then
+    if $interactive; then
         read -r -p "Convert $file to .html with $tag tags? [y/n] " confirmation
         if [ "$confirmation" != "y" ]; then
             continue
