@@ -12,6 +12,14 @@ I have these scripts in my `~/bin`, and will run `degas` to edit files, and `reg
 `install` will copy the contents of `tools` into `~/bin` without the .sh, .bash extensions and `chmod +x` them.
 usage: `chmod +x install && ./install`
 
+`$ degas` will try to convert all the .html files in the current directory with confirmation on each file.  It will not run unless the first line contains \<script\> or \<style\>.
+
+`$ degas -q` will not ask for confirmation but will still ignore files without correct tags on first line.
+
+`$ degas [-q] file [files...]` will target only the specified files.
+
+`$ regas [files...]` attempts to convert all .js, .css to .html by inserting the appropriate html tag into the first and last lines.
+
 ## Summary
 - `degas.bash`: converts .html to .js or .css if \<script\> or \<style\> tags found in the first line.
 - `regas.bash`: converts .js and .css to .html and inserts \<script\> or \<style\> tags.
