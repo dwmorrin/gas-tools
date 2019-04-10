@@ -7,10 +7,11 @@ Could just be my workspace setup, but I wasn't getting good syntax highlighting 
 
 ## installation
 **Warning: This is a work in progress.  Please test before using.**
+
 I have these scripts in my `~/bin`, and will run `degas` to edit files, and `regas` before commiting.
 
 `install` will copy the contents of `tools` into `~/bin` without the .sh, .bash extensions and `chmod +x` them.
-usage: `bash install && ./install`
+usage: `bash install`
 
 ## usage
 `degas [-iqr] [files...]`
