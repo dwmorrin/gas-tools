@@ -1,20 +1,28 @@
 #!/bin/bash
 # helper script for working on Google Apps Script projects with clasp
 
-progname="$(basename "$0")"
 interactive=false
-quiet=false
 noargs=false
+progname="$(basename "$0")"
+progpath="$0"
+quiet=false
+recursive=false
 
-while getopts "iq" opt; do
+while getopts "iqr" opt; do
     case "$opt" in
         i) interactive=true;;
         q) quiet=true;;
-       \?) echo "Usage: $progname [-q]"
+        r) recursive=true;;
+       \?) echo "Usage: $progname [-iqr]"
            exit 1;;
     esac
 done
 shift $((OPTIND -1))
+
+if $recursive; then
+    find . \( -name '*.js' -o -name '*.css' \) -print0 | xargs -0 "$progpath" -q
+    exit 0
+fi
 
 if [[ $# -eq 0 ]]; then
     noargs=true

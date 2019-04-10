@@ -5,20 +5,28 @@
 
 interactive=false
 noargs=false
+progpath="$0"
 progname="$(basename "$0")"
 quiet=false
+recursive=false
 scriptPattern='<script>'
 stylePattern='<style>'
 
-while getopts "iq" opt; do
+while getopts "iqr" opt; do
     case "$opt" in
         i) interactive=true;;
         q) quiet=true;;
-       \?) echo "Usage: $progname [-iq]"
+        r) recursive=true;;
+       \?) echo "Usage: $progname [-iqr]"
            exit 1;;
     esac
 done
 shift $((OPTIND - 1))
+
+if $recursive; then
+    find . -name '*.html' -print0 | xargs -0 "$progpath" -q
+    exit 0
+fi
 
 if [[ $# -eq 0 ]]; then
     noargs=true
@@ -55,7 +63,7 @@ for file; do
         if $interactive; then
             read -r -p "Convert $file to $ext? [y/n] " confirmation
             if [[ $confirmation != [Yy] ]]; then
-                continue
+                return
             fi
             echo "  Converting $file"
         fi
