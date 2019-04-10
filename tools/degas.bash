@@ -63,7 +63,7 @@ for file; do
         if $interactive; then
             read -r -p "Convert $file to $ext? [y/n] " confirmation
             if [[ $confirmation != [Yy] ]]; then
-                return
+                continue
             fi
             echo "  Converting $file"
         fi
