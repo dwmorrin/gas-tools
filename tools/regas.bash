@@ -30,7 +30,7 @@ fi
 
 if ! $quiet && $noargs; then
     read -r -p "Convert all .js and .css to .html and add html tags? [y/n] " confirmation
-    if [ "$confirmation" != "y" ]; then
+    if [[ $confirmation != [Yy] ]]; then
         exit 1
     fi
 fi
@@ -55,7 +55,7 @@ for file; do
     fi
     if $interactive; then
         read -r -p "Convert $file to .html with $tag tags? [y/n] " confirmation
-        if [ "$confirmation" != "y" ]; then
+        if [[ $confirmation != [Yy] ]]; then
             continue
         fi
     fi

@@ -3,10 +3,8 @@
 # converts .html files starting with <script> into .js files
 # converts .css files starting with <style> into .css files
 
-bold=$(tput bold)
 interactive=false
 noargs=false
-norm=$(tput sgr0)
 progname="$(basename "$0")"
 quiet=false
 scriptPattern='<script>'
@@ -35,9 +33,9 @@ if [[ $# -eq 0 ]]; then
 fi
 
 if ! $quiet && $noargs; then
-    read -r -p "Convert all .html to .js or .css and remove html tags? ${bold}[y/n]${norm} "\
+    read -r -p "Convert all .html to .js or .css and remove html tags? [y/n] "\
         confirmation
-    if [ "$confirmation" != "y" ]; then
+    if [[ $confirmation != [Yy] ]]; then
         exit 1
     fi
 fi
@@ -56,7 +54,7 @@ for file; do
     if [[ -n ${ext+1} ]]; then
         if $interactive; then
             read -r -p "Convert $file to $ext? [y/n] " confirmation
-            if [[ $confirmation != y ]]; then
+            if [[ $confirmation != [Yy] ]]; then
                 continue
             fi
             echo "  Converting $file"
