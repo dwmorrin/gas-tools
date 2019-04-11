@@ -13,14 +13,18 @@ while getopts "iqr" opt; do
         i) interactive=true;;
         q) quiet=true;;
         r) recursive=true;;
-       \?) echo "Usage: $progname [-iqr]"
+       \?) echo "Usage: $progname [-iqr] [dir] [files...]"
            exit 1;;
     esac
 done
 shift $((OPTIND -1))
 
-if $recursive; then
-    find . \( -name '*.js' -o -name '*.css' \) -print0 | xargs -0 "$progpath" -q
+if [[ $# -eq 1 ]] && [[ -d "$1" ]]; then
+    targetDir="$1"
+fi
+
+if $recursive || [[ -n ${targetDir+1} ]]; then
+    find "${targetDir:-$PWD}" \( -name '*.js' -o -name '*.css' \) -print0 | xargs -0 "$progpath" -q
     exit 0
 fi
 

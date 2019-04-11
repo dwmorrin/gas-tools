@@ -14,13 +14,17 @@ I have these scripts in my `~/bin`, and will run `degas` to edit files, and `reg
 usage: `bash install`
 
 ## usage
-`degas [-iqr] [files...]`
+`degas [-iqr] [dir] [files...]`
 
 `degas` is used to convert .html files to .js or .css.  It detects the file type by checking the first line for either a `<script>` tag or a `<style>` tag.  It will remove these tags and the matching closing tags.  *(Note: currenly just using `sed` to globally strip these tags - i.e. it's not "smart" in case you've got tags nested inside your file for some reason.)*
 
-`regas [-iqr] [files...]`
+`regas [-iqr] [dir] [files...]`
 
 `regas` is used to convert .js and .css files to .html by inserting the appropriate html tag into the first and last lines.
+
+`dir` - if the first argument is a directory, either command is invoked with an implicit `-r` option in `dir`.
+
+`files...` - targets only the specified `files`.
 
 #### options
 * -i will request confirmation for each file.
