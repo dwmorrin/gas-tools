@@ -7,10 +7,31 @@ interactive=false
 noargs=false
 progpath="$0"
 progname="$(basename "$0")"
+projectRoot=
 quiet=false
 recursive=false
 scriptPattern='<script>'
 stylePattern='<style>'
+
+# no args: find ,clasp and run this program recursively from there
+if [[ $# -eq 0 ]]; then
+    while [[ ${PWD##$HOME} != "$PWD" ]] && \
+        [[ $PWD != "$HOME" ]]; do
+        if compgen -G ".clasp*" >/dev/null; then
+            projectRoot=$PWD
+            break
+        fi
+        cd ..
+    done
+
+    if [[ -z $projectRoot ]]; then
+        echo "Cannot find .clasp file to determine GAS project root"
+        exit 1
+    fi
+
+    "$progpath" -r
+    exit 0
+fi
 
 while getopts "iqr" opt; do
     case "$opt" in
@@ -22,6 +43,7 @@ while getopts "iqr" opt; do
     esac
 done
 shift $((OPTIND - 1))
+
 
 if [[ $# -eq 1 ]] && [[ -d "$1" ]]; then
     targetDir="$1"
