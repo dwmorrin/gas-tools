@@ -24,7 +24,7 @@ if [[ $# -eq 0 ]]; then
             projectRoot="$PWD"
             break
         fi
-        cd -eP .. || die "Cannot find .clasp or .regas file to determine GAS project root"
+        cd -P .. || die "Cannot find .clasp or .regas file to determine GAS project root"
     done
     shopt -u extglob
 

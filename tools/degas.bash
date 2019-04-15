@@ -27,7 +27,7 @@ if [[ $# -eq 0 ]]; then
             projectRoot="$PWD"
             break
         fi
-        cd -eP .. || die "Cannot find .clasp file to determine GAS project root"
+        cd -P .. || die "Cannot find .clasp file to determine GAS project root"
     done
 
     if [[ -z $projectRoot ]]; then
