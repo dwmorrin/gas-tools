@@ -1,20 +1,80 @@
 #!/bin/bash
 # helper script for working on Google Apps Script projects with clasp
 
-progname="$(basename "$0")"
 interactive=false
-quiet=false
 noargs=false
+progname="$(basename "$0")"
+progpath="$0"
+quiet=false
+recursive=false
 
-while getopts "iq" opt; do
+die() {
+  message="$1"
+  errno="${2:-1}"
+  echo "$message"
+  exit "$errno"
+}
+
+# no args: find .clasp and run this program recursively from there
+if [[ $# -eq 0 ]]; then
+    shopt -s extglob
+    while [[ ${PWD##$HOME} != "$PWD" ]] && \
+        [[ $PWD != "$HOME" ]]; do
+        if compgen -G ".+(clasp|regas)*" >/dev/null; then
+            projectRoot="$PWD"
+            break
+        fi
+        cd -P .. || die "Cannot find .clasp or .regas file to determine GAS project root"
+    done
+    shopt -u extglob
+
+    if [[ -z $projectRoot ]]; then
+        die "Cannot find .clasp file to determine GAS project root"
+    fi
+
+    args=(-r)
+    if [[ -f .regasignore ]]; then
+        args+=(-x)
+        args+=(.regasignore)
+    fi
+    "$progpath" "${args[@]}"
+    exit 0
+fi
+
+while getopts "iqrx:" opt; do
     case "$opt" in
         i) interactive=true;;
         q) quiet=true;;
-       \?) echo "Usage: $progname [-q]"
-           exit 1;;
+        r) recursive=true;;
+        x) ignoreFile="$OPTARG";; # not user supplied
+       \?) die "Usage: $progname [-iqr] [dir] [files...]";;
     esac
 done
-shift $((OPTIND -1))
+shift $((OPTIND - 1))
+
+if [[ $# -eq 1 ]] && [[ -d "$1" ]]; then
+    targetDir="$1"
+fi
+
+if $recursive || [[ -n $targetDir ]]; then
+    if [[ $# -gt 0 ]]; then # prevent `-r filename`
+      die "Usage: illegal combination of arguments. Perhaps a filename with -r?"
+    fi
+    if [[ -n $ignoreFile ]]; then
+        comment='#'
+        ignore=(-not \( -path "*.git*")
+        while read -r line; do
+            if [[ $line =~ $comment ]]; then
+                continue
+            fi
+            ignore+=(-o -path "*""$line""*")
+        done <"$ignoreFile"
+        ignore+=(\))
+    fi
+    find "${targetDir:-$PWD}" \( -name '*.js' -o -name '*.css' \) \
+        "${ignore[@]}" -print0 | xargs -0 "$progpath" -q
+    exit 0
+fi
 
 if [[ $# -eq 0 ]]; then
     noargs=true
@@ -24,8 +84,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 if [[ $# -eq 0 ]]; then
-    echo "$(basename "$0") converts .js and .css to .html: no .js or .css found"
-    exit 1
+    die "$(basename "$0") converts .js and .css to .html: no .js or .css found"
 fi
 
 if ! $quiet && $noargs; then
@@ -46,7 +105,13 @@ for file; do
         fi
         continue;;
     esac
-    firstline=$(sed 1q "$file")
+    read -r firstline <"$file"
+    if [[ $firstline =~ no-regas ]]; then
+        if ! $quiet; then
+            echo "  Ignoreing $file: has no-regas in first line"
+        fi
+        continue
+    fi
     if [[ $firstline =~ $tag ]]; then
         if ! $quiet; then
             echo "  Ignoring $file: already has $tag tag in first line"
@@ -70,8 +135,7 @@ $a\
     then
         rm "$file.bak"
     else
-        echo "aborting: sed exited with error. Check for a .bak file."
-        exit 1
+        die "aborting: sed exited with error. Check for a .bak file."
     fi
     mv "$file" "${file%$ext}html"
 

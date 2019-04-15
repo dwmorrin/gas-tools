@@ -1,25 +1,32 @@
 # gas-tools (work in progress)
 Google Apps Script Command Line Tools
 
-These are some shell scripts I'm using to help me make Google Apps Script projects with Vim, ALE, eslint, etc.
-I make web apps with a lot of client-side JavaScript, and I've had a hard time with the GAS restriction of only .html files.
+These are some bash shell scripts I'm using to help me make Google Apps Script projects.
+I use Apps Script to make web apps with a lot of client-side JavaScript, and my current linting setup (vim + [ale](https://github.com/w0rp/ale) + eslint) doesn't work well with the GAS restriction of only .html files.
 Could just be my workspace setup, but I wasn't getting good syntax highlighting or linting with the inline script files.
 
-## Typical usage
-I have these scripts in my `~/bin`, and will run `degas` to edit files, and `regas` before commiting.
+## installation
 **Warning: This is a work in progress.  Please test before using.**
 
+I have these scripts in my `~/bin`, and will run `degas` to edit files, and `regas` before commiting.
+
 `install` will copy the contents of `tools` into `~/bin` without the .sh, .bash extensions and `chmod +x` them.
-usage: `chmod +x install && ./install`
+usage: `bash install`
 
-`$ degas` will try to convert all the .html files in the current directory with confirmation on each file.  It will not run unless the first line contains \<script\> or \<style\>.
+## usage
+`degas [-iqr] [dir] [files...]`
 
-`$ degas -q` will not ask for confirmation but will still ignore files without correct tags on first line.
+`degas` is used to convert .html files to .js or .css.  It detects the file type by checking the first line for either a `<script>` tag or a `<style>` tag.  It will remove these tags and the matching closing tags.  *(Note: currenly just using `sed` to globally strip these tags - i.e. it's not "smart" in case you've got tags nested inside your file for some reason.)*
 
-`$ degas [-q] file [files...]` will target only the specified files.
+`regas [-iqr] [dir] [files...]`
 
-`$ regas [files...]` attempts to convert all .js, .css to .html by inserting the appropriate html tag into the first and last lines.
+`regas` is used to convert .js and .css files to .html by inserting the appropriate html tag into the first and last lines.
 
-## Summary
-- `degas.bash`: converts .html to .js or .css if \<script\> or \<style\> tags found in the first line.
-- `regas.bash`: converts .js and .css to .html and inserts \<script\> or \<style\> tags.
+`dir` - if the first argument is a directory, either command is invoked with an implicit `-r` option in `dir`.
+
+`files...` - targets only the specified `files`.
+
+#### options
+* -i will request confirmation for each file.
+* -q suppresses output (todo: need to send error messages to standard error rather than standard output).
+* -r will recursively walk (using `find`) from the current directory to apply the tool to multiple directories.
