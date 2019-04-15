@@ -8,22 +8,28 @@ progpath="$0"
 quiet=false
 recursive=false
 
+die() {
+  message="$1"
+  errno="${2:-1}"
+  echo "$message"
+  exit "$errno"
+}
+
 # no args: find .clasp and run this program recursively from there
 if [[ $# -eq 0 ]]; then
     shopt -s extglob
     while [[ ${PWD##$HOME} != "$PWD" ]] && \
         [[ $PWD != "$HOME" ]]; do
         if compgen -G ".+(clasp|regas)*" >/dev/null; then
-            projectRoot=$PWD
+            projectRoot="$PWD"
             break
         fi
-        cd ..
+        cd -eP .. || die "Cannot find .clasp or .regas file to determine GAS project root"
     done
     shopt -u extglob
 
     if [[ -z $projectRoot ]]; then
-        echo "Cannot find .clasp file to determine GAS project root"
-        exit 1
+        die "Cannot find .clasp file to determine GAS project root"
     fi
 
     args=(-r)
@@ -41,17 +47,19 @@ while getopts "iqrx:" opt; do
         q) quiet=true;;
         r) recursive=true;;
         x) ignoreFile="$OPTARG";; # not user supplied
-       \?) echo "Usage: $progname [-iqr] [dir] [files...]"
-           exit 1;;
+       \?) die "Usage: $progname [-iqr] [dir] [files...]";;
     esac
 done
-shift $((OPTIND -1))
+shift $((OPTIND - 1))
 
 if [[ $# -eq 1 ]] && [[ -d "$1" ]]; then
     targetDir="$1"
 fi
 
 if $recursive || [[ -n $targetDir ]]; then
+    if [[ $# -gt 0 ]]; then # prevent `-r filename`
+      die "Usage: illegal combination of arguments. Perhaps a filename with -r?"
+    fi
     if [[ -n $ignoreFile ]]; then
         comment='#'
         ignore=(-not \( -path "*.git*")
@@ -76,8 +84,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 if [[ $# -eq 0 ]]; then
-    echo "$(basename "$0") converts .js and .css to .html: no .js or .css found"
-    exit 1
+    die "$(basename "$0") converts .js and .css to .html: no .js or .css found"
 fi
 
 if ! $quiet && $noargs; then
@@ -98,7 +105,7 @@ for file; do
         fi
         continue;;
     esac
-    firstline=$(sed 1q "$file")
+    read -r firstline <"$file"
     if [[ $firstline =~ no-regas ]]; then
         if ! $quiet; then
             echo "  Ignoreing $file: has no-regas in first line"
@@ -128,8 +135,7 @@ $a\
     then
         rm "$file.bak"
     else
-        echo "aborting: sed exited with error. Check for a .bak file."
-        exit 1
+        die "aborting: sed exited with error. Check for a .bak file."
     fi
     mv "$file" "${file%$ext}html"
 

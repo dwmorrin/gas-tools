@@ -12,20 +12,26 @@ recursive=false
 scriptPattern='<script>'
 stylePattern='<style>'
 
+die() {
+  local message="$1"
+  local errno="${2:-1}"
+  echo "$message"
+  exit "$errno"
+}
+
 # no args: find .clasp and run this program recursively from there
 if [[ $# -eq 0 ]]; then
     while [[ ${PWD##$HOME} != "$PWD" ]] && \
         [[ $PWD != "$HOME" ]]; do
         if compgen -G ".clasp*" >/dev/null; then
-            projectRoot=$PWD
+            projectRoot="$PWD"
             break
         fi
-        cd ..
+        cd -eP .. || die "Cannot find .clasp file to determine GAS project root"
     done
 
     if [[ -z $projectRoot ]]; then
-        echo "Cannot find .clasp file to determine GAS project root"
-        exit 1
+        die "Cannot find .clasp file to determine GAS project root"
     fi
 
     "$progpath" -r
@@ -37,8 +43,7 @@ while getopts "iqr" opt; do
         i) interactive=true;;
         q) quiet=true;;
         r) recursive=true;;
-       \?) echo "Usage: $progname [-iqr] [dir] [files...]"
-           exit 1;;
+       \?) die "Usage: $progname [-iqr] [dir] [files...]";;
     esac
 done
 shift $((OPTIND - 1))
@@ -61,8 +66,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 if [[ $# -eq 0 ]]; then
-    echo "$progname converts .html to .js or .css: no .html found"
-    exit 1
+    die "$progname converts .html to .js or .css: no .html found"
 fi
 
 if ! $quiet && $noargs; then
@@ -75,7 +79,7 @@ fi
 
 for file; do
     unset ext
-    firstline=$(sed 1q "$file")
+    read -r firstline <"$file"
     if [[ $firstline =~ $scriptPattern ]]; then
         ext="js"
         tag="script"
@@ -95,8 +99,7 @@ for file; do
             /<\/*'"$tag"'>/d' "$file"; then
             rm "$file.bak"
         else
-            echo "aborting: sed exited with error. check for a .bak file."
-            exit 1
+            die "aborting: sed exited with error. check for a .bak file."
         fi
         mv "$file" "${file%html}$ext"
     else
