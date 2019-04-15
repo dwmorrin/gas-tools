@@ -13,6 +13,15 @@ I have these scripts in my `~/bin`, and will run `degas` to edit files, and `reg
 `install` will copy the contents of `tools` into `~/bin` without the .sh, .bash extensions and `chmod +x` them.
 usage: `bash install`
 
+Make a `.regasignore` file that points to the directory of your server-side .js files.  In my project, this is a `gs` directory.  If you do not have this file, you cannot run `regas` without an argument or your server-side code will get changed into .html files.
+
+```
+$ cat .regasignore
+# using a '#' anywhere in the line makes it a comment
+# this file tells `regas` to ignore the directory `gs`
+gs
+```
+
 ## usage
 `degas [-iqr] [dir] [files...]`
 
@@ -20,7 +29,7 @@ usage: `bash install`
 
 `regas [-iqr] [dir] [files...]`
 
-`regas` is used to convert .js and .css files to .html by inserting the appropriate html tag into the first and last lines.
+`regas` is used to convert .js and .css files to .html by inserting the appropriate html tag into the first and last lines.  See note above on creating a `.regasignore` file to avoid turning server-side .js files into .html files.
 
 `dir` - if the first argument is a directory, either command is invoked with an implicit `-r` option in `dir`.
 
