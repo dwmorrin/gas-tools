@@ -8,12 +8,38 @@ progpath="$0"
 quiet=false
 recursive=false
 
-while getopts "iqr" opt; do
+# no args: find .clasp and run this program recursively from there
+if [[ $# -eq 0 ]]; then
+    while [[ ${PWD##$HOME} != "$PWD" ]] && \
+        [[ $PWD != "$HOME" ]]; do
+        if compgen -G ".clasp*" >/dev/null; then
+            projectRoot=$PWD
+            break
+        fi
+        cd ..
+    done
+
+    if [[ -z $projectRoot ]]; then
+        echo "Cannot find .clasp file to determine GAS project root"
+        exit 1
+    fi
+
+    args=(-r)
+    if [[ -f .regasignore ]]; then
+        args+=(-x)
+        args+=(.regasignore)
+    fi
+    "$progpath" "${args[@]}"
+    exit 0
+fi
+
+while getopts "iqrx:" opt; do
     case "$opt" in
         i) interactive=true;;
         q) quiet=true;;
         r) recursive=true;;
-       \?) echo "Usage: $progname [-iqr] [dir] [files...]"
+        x) ignoreFile="$OPTARG";;
+       \?) echo "Usage: $progname [-iqrx] [dir] [files...]"
            exit 1;;
     esac
 done
@@ -23,8 +49,20 @@ if [[ $# -eq 1 ]] && [[ -d "$1" ]]; then
     targetDir="$1"
 fi
 
-if $recursive || [[ -n ${targetDir+1} ]]; then
-    find "${targetDir:-$PWD}" \( -name '*.js' -o -name '*.css' \) -print0 | xargs -0 "$progpath" -q
+if $recursive || [[ -n $targetDir ]]; then
+    if [[ -n $ignoreFile ]]; then
+        comment='#'
+        ignore=(-not \( -path "*.git*")
+        while read -r line; do
+            if [[ $line =~ $comment ]]; then
+                continue
+            fi
+            ignore+=(-o -path "*""$line""*")
+        done <"$ignoreFile"
+        ignore+=(\))
+    fi
+    find "${targetDir:-$PWD}" \( -name '*.js' -o -name '*.css' \) \
+        "${ignore[@]}" -print0 | xargs -0 "$progpath" -q
     exit 0
 fi
 
@@ -59,6 +97,12 @@ for file; do
         continue;;
     esac
     firstline=$(sed 1q "$file")
+    if [[ $firstline =~ no-regas ]]; then
+        if ! $quiet; then
+            echo "  Ignoreing $file: has no-regas in first line"
+        fi
+        continue
+    fi
     if [[ $firstline =~ $tag ]]; then
         if ! $quiet; then
             echo "  Ignoring $file: already has $tag tag in first line"

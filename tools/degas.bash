@@ -13,7 +13,7 @@ recursive=false
 scriptPattern='<script>'
 stylePattern='<style>'
 
-# no args: find ,clasp and run this program recursively from there
+# no args: find .clasp and run this program recursively from there
 if [[ $# -eq 0 ]]; then
     while [[ ${PWD##$HOME} != "$PWD" ]] && \
         [[ $PWD != "$HOME" ]]; do
@@ -49,7 +49,7 @@ if [[ $# -eq 1 ]] && [[ -d "$1" ]]; then
     targetDir="$1"
 fi
 
-if $recursive || [[ -n ${targetDir+1} ]]; then
+if $recursive || [[ -n $targetDir ]]; then
     find "${targetDir:-$PWD}" -name '*.html' -print0 | xargs -0 "$progpath" -q
     exit 0
 fi
@@ -84,8 +84,7 @@ for file; do
         ext="css"
         tag="style"
     fi
-    # test if ext is set, note [[ -v ]] not compat with stock MacOS /bin/bash
-    if [[ -n ${ext+1} ]]; then
+    if [[ -n $ext ]]; then
         if $interactive; then
             read -r -p "Convert $file to $ext? [y/n] " confirmation
             if [[ $confirmation != [Yy] ]]; then
