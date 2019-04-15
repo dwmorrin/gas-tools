@@ -7,7 +7,6 @@ interactive=false
 noargs=false
 progpath="$0"
 progname="$(basename "$0")"
-projectRoot=
 quiet=false
 recursive=false
 scriptPattern='<script>'

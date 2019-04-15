@@ -10,14 +10,16 @@ recursive=false
 
 # no args: find .clasp and run this program recursively from there
 if [[ $# -eq 0 ]]; then
+    shopt -s extglob
     while [[ ${PWD##$HOME} != "$PWD" ]] && \
         [[ $PWD != "$HOME" ]]; do
-        if compgen -G ".clasp*" >/dev/null; then
+        if compgen -G ".+(clasp|regas)*" >/dev/null; then
             projectRoot=$PWD
             break
         fi
         cd ..
     done
+    shopt -u extglob
 
     if [[ -z $projectRoot ]]; then
         echo "Cannot find .clasp file to determine GAS project root"
@@ -38,8 +40,8 @@ while getopts "iqrx:" opt; do
         i) interactive=true;;
         q) quiet=true;;
         r) recursive=true;;
-        x) ignoreFile="$OPTARG";;
-       \?) echo "Usage: $progname [-iqrx] [dir] [files...]"
+        x) ignoreFile="$OPTARG";; # not user supplied
+       \?) echo "Usage: $progname [-iqr] [dir] [files...]"
            exit 1;;
     esac
 done
