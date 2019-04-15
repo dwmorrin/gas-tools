@@ -102,7 +102,7 @@ for file; do
             die "aborting: sed exited with error. check for a .bak file."
         fi
         mv "$file" "${file%html}$ext"
-    else
+    elif $interactive; then
         echo "  Ignoring $file: expected <script> or <style> in first line."
         echo "  $file: line 1: $firstline"
         echo "  check rules on wiki page."
