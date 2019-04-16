@@ -23,19 +23,21 @@ gs
 ```
 
 ## usage
-`degas [-iqr] [dir] [files...]`
+#### `degas [-iqr] [dir] [files...]`
 
 `degas` is used to convert .html files to .js or .css.  It detects the file type by checking the first line for either a `<script>` tag or a `<style>` tag.  It will remove these tags and the matching closing tags.  *(Note: currenly just using `sed` to globally strip these tags - i.e. it's not "smart" in case you've got tags nested inside your file for some reason.)*
 
-`regas [-iqr] [dir] [files...]`
+#### `regas [-iqr] [dir] [files...]`
 
 `regas` is used to convert .js and .css files to .html by inserting the appropriate html tag into the first and last lines.  See note above on creating a `.regasignore` file to avoid turning server-side .js files into .html files.
 
-`dir` - if the first argument is a directory, either command is invoked with an implicit `-r` option in `dir`.
-
-`files...` - targets only the specified `files`.
-
-#### options
+##### `*egas` options
 * -i will request confirmation for each file.
 * -q suppresses output (todo: need to send error messages to standard error rather than standard output).
 * -r will recursively walk (using `find`) from the current directory to apply the tool to multiple directories.
+* `dir` - if the first argument is a directory, either command is invoked with an implicit `-r` option in `dir`.
+* `files...` - targets only the specified `files`.
+
+#### `clap`
+
+`clap` is a wrapper for `clasp push` that you can call at any depth of your project unlike the bare command which requires you be in the project's root directory.
