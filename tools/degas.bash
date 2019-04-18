@@ -1,7 +1,7 @@
 #!/bin/bash
 # helper script for working on Google Apps Script projects with clasp
 # converts .html files starting with <script> into .js files
-# converts .css files starting with <style> into .css files
+# converts .html files starting with <style> into .css files
 
 interactive=false
 noargs=false
