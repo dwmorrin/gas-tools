@@ -34,8 +34,9 @@ if [[ $# -eq 0 ]]; then
 
     args=(-r)
     if [[ -f .regasignore ]]; then
-        args+=(-x)
-        args+=(.regasignore)
+        args+=(-x .regasignore)
+    else
+        args+=(-i)
     fi
     "$progpath" "${args[@]}"
     exit 0
@@ -70,6 +71,9 @@ if $recursive || [[ -n $targetDir ]]; then
             ignore+=(-o -path "*""$line""*")
         done <"$ignoreFile"
         ignore+=(\))
+    elif $interactive; then
+        echo "TODO: write interactive code"
+        exit 2
     fi
     find "${targetDir:-$PWD}" \( -name '*.js' -o -name '*.css' \) \
         "${ignore[@]}" -print0 | xargs -0 "$progpath" -q
