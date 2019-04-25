@@ -72,8 +72,20 @@ if $recursive || [[ -n $targetDir ]]; then
         done <"$ignoreFile"
         ignore+=(\))
     elif $interactive; then
-        echo "TODO: write interactive code"
-        exit 2
+        echo "no .regasignore file found."
+        PS3="Select directory to change to HTML: "
+        if compgen -G */ &>/dev/null; then
+            select dir in */ "abort $progname"; do
+                if [[ $dir = "abort $progname" ]]; then
+                    exit 1
+                fi
+                targetDir=$dir
+                break
+            done
+        else
+            echo "usage: $progname needs .regasignore file to run safely, aborting"
+            exit 1
+        fi
     fi
     find "${targetDir:-$PWD}" \( -name '*.js' -o -name '*.css' \) \
         "${ignore[@]}" -print0 | xargs -0 "$progpath" -q
