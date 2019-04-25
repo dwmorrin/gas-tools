@@ -13,8 +13,7 @@ I have these scripts in my `~/bin`, and will run `degas` to edit files, and `reg
 `install` will copy the contents of `tools` into `~/bin` without the .sh, .bash extensions and `chmod +x` them.
 usage: `bash install`
 
-Make a `.regasignore` file that points to the directory of your server-side .js files.  In my project, this is a `gs` directory.  If you do not have this file, you cannot run `regas` without an argument or your server-side code will get changed into .html files.
-
+You can make a `.regasignore` file that points to the directory of your server-side .js files.  In my project, this is a `gs` directory.  Then you can run `regas` without arguments.  If you do not have this file, `regas` will offer to work on any subdirectories of the working directory, or exit if there are no subdirectories (in that case, you must specify `regas [files...]` to use the program).
 ```
 $ cat .regasignore
 # using a '#' anywhere in the line makes it a comment
@@ -25,7 +24,7 @@ gs
 ## usage
 #### `degas [-iqr] [dir] [files...]`
 
-`degas` is used to convert .html files to .js or .css.  It detects the file type by checking the first line for either a `<script>` tag or a `<style>` tag.  It will remove these tags and the matching closing tags.  *(Note: currenly just using `sed` to globally strip these tags - i.e. it's not "smart" in case you've got tags nested inside your file for some reason.)*
+`degas` is used to convert .html files to .js or .css.  It detects the file type by checking the first not blank line for either a `<script>` tag or a `<style>` tag.  It will remove any lines that begin with that tag (ignoring leading whitespace). _Be careful if you happen to have such tags embedded in your file (e.g. within a template literal)._
 
 #### `regas [-iqr] [dir] [files...]`
 
