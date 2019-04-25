@@ -108,10 +108,12 @@ for file; do
         fi
         mv "$file" "${file%html}$ext"
     elif $interactive; then
-        echo "  Ignoring $file: expected <script> or <style> in first line."
-        echo "  $file: line $lineno: $line"
-        echo "  check rules on wiki page."
-        echo "  open a new issue if you expected $file to work."
+        cat <<EOF
+Ignoring $file: expected <script> or <style> in first line.
+Found: $file: line $lineno: $line
+Check rules on wiki page.
+Open a new issue if you expected $file to work.
+EOF
     fi
 done
 
