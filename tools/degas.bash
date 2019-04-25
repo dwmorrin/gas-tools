@@ -79,11 +79,16 @@ fi
 
 for file; do
     unset ext
-    read -r firstline <"$file"
-    if [[ $firstline =~ $scriptPattern ]]; then
+    while read line; do
+        lineno=$((lineno + 1))
+        if [[ -n $line ]]; then
+            break
+        fi
+    done <"$file"
+    if [[ $line =~ $scriptPattern ]]; then
         ext="js"
         tag="script"
-    elif [[ $firstline =~ $stylePattern ]]; then
+    elif [[ $line =~ $stylePattern ]]; then
         ext="css"
         tag="style"
     fi
@@ -96,7 +101,7 @@ for file; do
             echo "  Converting $file"
         fi
         if sed -i'.bak' '
-            /<\/*'"$tag"'>/d' "$file"; then
+            /^[[:space:]]*<\/*'"$tag"'>/d' "$file"; then
             rm "$file.bak"
         else
             die "aborting: sed exited with error. check for a .bak file."
@@ -104,7 +109,7 @@ for file; do
         mv "$file" "${file%html}$ext"
     elif $interactive; then
         echo "  Ignoring $file: expected <script> or <style> in first line."
-        echo "  $file: line 1: $firstline"
+        echo "  $file: line $lineno: $line"
         echo "  check rules on wiki page."
         echo "  open a new issue if you expected $file to work."
     fi
