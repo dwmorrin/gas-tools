@@ -20,4 +20,5 @@ if [[ -z $projectRoot ]]; then
     die "Cannot find .clasp file to determine GAS project root"
 fi
 
+command -v regas &>/dev/null && regas &>/dev/null
 clasp push
