@@ -74,8 +74,8 @@ if $recursive || [[ -n $targetDir ]]; then
     elif $interactive; then
         echo "no .regasignore file found."
         PS3="Select directory to change to HTML: "
-        if compgen -G */ &>/dev/null; then
-            select dir in */ "abort $progname"; do
+        if compgen -G ./*/ &>/dev/null; then
+            select dir in ./*/ "abort $progname"; do
                 if [[ $dir = "abort $progname" ]]; then
                     exit 1
                 fi
