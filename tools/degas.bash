@@ -1,7 +1,7 @@
 #!/bin/bash
 # helper script for working on Google Apps Script projects with clasp
-# converts .html files starting with <script> into .js files
-# converts .html files starting with <style> into .css files
+# converts .html files starting with <script> into .tmp.js files
+# converts .html files starting with <style> into .tmp.css files
 
 interactive=false
 noargs=false
@@ -79,7 +79,7 @@ fi
 
 for file; do
     unset ext
-    while read line; do
+    while read -r line; do
         lineno=$((lineno + 1))
         if [[ -n $line ]]; then
             break
@@ -106,7 +106,7 @@ for file; do
         else
             die "aborting: sed exited with error. check for a .bak file."
         fi
-        mv "$file" "${file%html}$ext"
+        mv "$file" "${file%html}tmp.$ext"
     elif $interactive; then
         cat <<EOF
 Ignoring $file: expected <script> or <style> in first line.
