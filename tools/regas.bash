@@ -72,22 +72,21 @@ if $recursive || [[ -n $targetDir ]]; then
         done <"$ignoreFile"
         ignore+=(\))
     elif $interactive; then
-        echo "no .regasignore file found."
-        PS3="Select directory to change to HTML: "
-        if compgen -G ./*/ &>/dev/null; then
-            select dir in ./*/ "abort $progname"; do
-                if [[ $dir = "abort $progname" ]]; then
-                    exit 1
-                fi
-                targetDir=$dir
-                break
-            done
-        else
-            echo "usage: $progname needs .regasignore file to run safely, aborting"
-            exit 1
+        if ! compgen -G ./*.tmp.* &>/dev/null; then
+            echo "no .regasignore file or *.tmp.* files found."
+            PS3="Select directory to look for *.tmp.* files or abort: "
+            if compgen -G ./*/ &>/dev/null; then
+                select dir in ./*/ "abort $progname"; do
+                    if [[ $dir = "abort $progname" ]]; then
+                        exit 1
+                    fi
+                    targetDir=$dir
+                    break
+                done
+            fi
         fi
     fi
-    find "${targetDir:-$PWD}" \( -name '*.js' -o -name '*.css' \) \
+    find "${targetDir:-$PWD}" \( -name '*.tmp.js' -o -name '*.tmp.css' \) \
         "${ignore[@]}" -print0 | xargs -0 "$progpath" -q
     exit 0
 fi
@@ -96,7 +95,7 @@ if [[ $# -eq 0 ]]; then
     noargs=true
     # insert all .js and .css files in pwd as arguments, or null if files not found
     shopt -s nullglob
-    set -- *.{js,css}
+    set -- *.tmp.{js,css}
 fi
 
 if [[ $# -eq 0 ]]; then
@@ -111,7 +110,7 @@ if ! $quiet && $noargs; then
 fi
     
 for file; do
-    ext="${file##*.}"
+    ext="${file##*.tmp.}"
     case "$ext" in
         "js") tag="script";;
         "css") tag="style";;
@@ -153,7 +152,7 @@ $a\
     else
         die "aborting: sed exited with error. Check for a .bak file."
     fi
-    mv "$file" "${file%$ext}html"
+    mv "$file" "${file%tmp.$ext}html"
 
 done
 
