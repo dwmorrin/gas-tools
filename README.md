@@ -1,12 +1,16 @@
-# gas-tools (work in progress)
-Google Apps Script Command Line Tools
+# gas-tools (deprecated)
 
-These are some bash shell scripts I'm using to help me make Google Apps Script projects.
-I use Apps Script to make web apps with a lot of client-side JavaScript, and my current linting setup (vim + [ale](https://github.com/w0rp/ale) + eslint) doesn't work well with the GAS restriction of only .html files.
-Could just be my workspace setup, but I wasn't getting good syntax highlighting or linting with the inline script files.
+This is a small collection of scripts to modify files within a Google Apps Script
+project.  It was a hack to get syntax highlighting to work... but then I finally
+realized how to do it the right way by adding just a couple of lines to my .vimrc!
+
+While I no longer use these scripts, they are still instructive if you want a shell
+script to examine directories and text files.  These scripts were looking for HTML
+files with inline Javascript.  One script would find the appropriate files and
+change the extension to get syntax highlighting to work (not the right way to do 
+it, btw) and the complementary script would put the regular extensions back.
 
 ## installation
-**Warning: This is a work in progress.  Please test before using.**
 
 I have these scripts in my `~/bin`, and will run `degas` to edit files, and `regas` before commiting.
 
